@@ -37,12 +37,12 @@ def maven_install(
         fetch_sources = fetch_sources,
     )
 
-def artifact(a, repository_name = REPOSITORY_NAME):
+def artifact(a, repository_name = REPOSITORY_NAME, variant = "_lib"):
     artifact_obj = _parse_artifact_str(a) if type(a) == "string" else a
-    return "@%s//:%s" % (repository_name, _escape(artifact_obj["group"] + ":" + artifact_obj["artifact"]))
+    return "@%s//:%s" % (repository_name, _escape(artifact_obj["group"] + ":" + artifact_obj["artifact"]) + variant)
 
-def maven_artifact(a):
-    return artifact(a, repository_name = REPOSITORY_NAME)
+def maven_artifact(a, variant = "_lib"):
+    return artifact(a, repository_name = REPOSITORY_NAME, variant = variant)
 
 def _escape(string):
     return string.replace(".", "_").replace("-", "_").replace(":", "_")
