@@ -202,7 +202,7 @@ def generate_imports(repository_ctx, dep_tree, srcs_dep_tree = None):
             #       ":org_hamcrest_hamcrest_library_1_3",
             #   ]
             # )
-            t_dep_aliases = []
+            t_dep_aliases = ["\t\t\":" + target_alias_label + "\""]
             for transitive_dep_coord in artifact["dependencies"]:
                 t_dep = _find_dependency_by_coord(dep_tree, transitive_dep_coord)
                 if t_dep == None:
