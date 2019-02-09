@@ -190,8 +190,8 @@ def generate_imports(repository_ctx, dep_tree, srcs_dep_tree = None):
             #   name = "org_hamcrest_hamcrest_library",
             #   actual = "org_hamcrest_hamcrest_library_1_3",
             # )
-            target_alias_label = _escape(_strip_packaging_and_classifier_and_version(artifact["coord"]))
-            all_imports.append("alias(\n\tname = \"%s\",\n\tactual = \"%s\",\n)" % (target_alias_label, target_label))
+            versionless_target_alias_label = _escape(_strip_packaging_and_classifier_and_version(artifact["coord"]))
+            all_imports.append("alias(\n\tname = \"%s\",\n\tactual = \"%s\",\n)" % (versionless_target_alias_label, target_label))
 
             # 7. Create java_library rule (includes transitive dependencies)
             #
@@ -202,15 +202,15 @@ def generate_imports(repository_ctx, dep_tree, srcs_dep_tree = None):
             #       ":org_hamcrest_hamcrest_library_1_3",
             #   ]
             # )
-            t_dep_aliases = ["\t\t\":" + target_alias_label + "\""]
+            transitive_dep_aliases = ["\t\t\":" + versionless_target_alias_label + "\""]
             for transitive_dep_coord in artifact["dependencies"]:
-                t_dep = _find_dependency_by_coord(dep_tree, transitive_dep_coord)
-                if t_dep == None:
+                transitive_dep = _find_dependency_by_coord(dep_tree, transitive_dep_coord)
+                if transitive_dep == None:
                     fail("Could not find transitive dependency of " + artifact["coord"] + ": " + transitive_dep_coord + "\n" +
                          "Parsed artifact data:" + repr(artifact) + "\n" +
                          "Parsed dependency output:" + repr(dep_tree))
 
-                t_dep_aliases.append("\t\t\":" + _escape(_strip_packaging_and_classifier_and_version(t_dep["coord"])) + "\"")
+                transitive_dep_aliases.append("\t\t\":" + _escape(_strip_packaging_and_classifier_and_version(transitive_dep["coord"])) + "\"")
 
             target_library = \
 """
@@ -221,8 +221,8 @@ java_library(
     ]
 )
 """.lstrip()
-            t_dep_aliases = _deduplicate_list(t_dep_aliases)
-            all_imports.append(target_library.format(target_alias_label + "_lib", ",\n".join(t_dep_aliases)))
+            transitive_dep_aliases = _deduplicate_list(transitive_dep_aliases)
+            all_imports.append(target_library.format(versionless_target_alias_label + "_lib", ",\n".join(transitive_dep_aliases)))
 
 
         elif absolute_path_to_artifact == None:
